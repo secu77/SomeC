@@ -1,3 +1,23 @@
+/*
+ *  Copia.c Version 1.0
+ *
+ *  Este programa te permite hacer un duplicado de un archivo pasado por argumentos a otro destino, 
+ *  también pasado por argumento. 
+ *  El programa determina los bytes del archivo a copiar, reserva un buffer de esa cantidad, y posteriormente
+ *  lee dicho archivo, lo traslada al buffer, y del buffer lo escribe al archivo destino. Creando un proceso hijo,
+ *  que será el que lea de la tuberia y escriba en el archivo final.
+ *
+ *  Este programa no satisface el objetivo real, ya que la transmisión debería hacerse por bloques de 'x' bytes,
+ *  ya que así te evitas reservar un buffer muy grande de memoria.
+ *
+ *  Sería funcional para archivos pequeños que copiar, pero no para archivos de gran tamaño.
+ *
+ *  A espera de revisiones y mejoras.
+ *
+ *  Secu, de StationX11
+ */
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -5,7 +25,7 @@
 #include <sys/stat.h>
 
 /*
- *  FUNCION que obtiene el tamaño en bytes de un archivo pasandole la ruta de este.
+ *  Función que obtiene el tamaño en bytes de un archivo pasandole la ruta de este.
  *  devuelve el tamaño total en un long.
  */	
 long getBytes(char *path){
@@ -19,6 +39,10 @@ long getBytes(char *path){
   }
 }
 
+
+/*
+ *  Función principal, o funcion Main.
+ */
 int main(int argc, char **argv){
 
   char *buffer;
