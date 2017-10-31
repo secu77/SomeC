@@ -32,35 +32,33 @@ int main(int argc, char **argv){
   int fd[2];
 
 
- /*
-  *  Validando argumentos introducidos en el inicio
-  */	
+  /*
+   *  Validando argumentos introducidos en el inicio
+   */	
   if(argc == 3){
-
     path = argv[1];
     outpath = argv[2];
 
+    pipe(fd);
 
-	pipe(fd);
-
- /*
-	*  Validando la obtención del número de bytes de la ruta del archivo
-	*/
-	numbytes = getBytes(path);
-	if(numbytes < 1){
-	  printf("\nError al determinar el numero de bytes del archivo %s\n",path);
-	  exit(-1);
-	} 
+    /*
+     *  Validando la obtención del número de bytes de la ruta del archivo
+     */
+     numbytes = getBytes(path);
+     if(numbytes < 1){
+       printf("\nError al determinar el numero de bytes del archivo %s\n",path);
+       exit(-1);
+     } 
 
 
- /*
-	*  Creacion de Procesos:
-	*
-	*   -El proceso Padre lee el fichero que se le pasa por argumentos, determina el numero de
-	*    de bytes a extraer y los escribe en la tuberia.
-	*   -El proceso Hijo comprueba si existe el fichero pasado por segundo argumento y si puede
-	*    crearlo, lee de la tuberia los bytes pasados por el padre y los escribe en el archivo.
-	*/
+    /*
+     *  Creacion de Procesos:
+     *
+     *   -El proceso Padre lee el fichero que se le pasa por argumentos, determina el numero de
+     *    de bytes a extraer y los escribe en la tuberia.
+     *   -El proceso Hijo comprueba si existe el fichero pasado por segundo argumento y si puede
+     *    crearlo, lee de la tuberia los bytes pasados por el padre y los escribe en el archivo.
+     */
     pid = fork();
     switch(pid){
 
@@ -69,89 +67,89 @@ int main(int argc, char **argv){
         exit(-1);
         break;
 
-     /*
-	    *  Proceso Hijo
-	    */
+      /*
+       *  Proceso Hijo
+       */
       case 0:
-
-       /*
-	      *  Cerrando el descriptor de la tuberia en modo escritura y leyendo los
-	      *  bytes del modo lectura
-	      */      
+        
+        /*
+	 *  Cerrando el descriptor de la tuberia en modo escritura y leyendo los
+	 *  bytes del modo lectura
+	 */      
         close(fd[1]);
         read(fd[0],bufferout,numbytes);
 
         //printf("\nSoy el hijo y he leido de la tuberia %ld bytes\n",numbytes);
 
-     /*
-	    *  Validando la apertura/creacion del archivo de destino
-	    */
-	    outcriptor = open(outpath, O_WRONLY|O_CREAT|O_TRUNC, 0622);
-	    if(outcriptor < 0){
-	      printf("\nError al crear el archivo de destino %s\n",outpath);
-	      exit(-1);
-	    }
+        /*
+	 *  Validando la apertura/creacion del archivo de destino
+	 */
+	outcriptor = open(outpath, O_WRONLY|O_CREAT|O_TRUNC, 0622);
+	if(outcriptor < 0){
+	  printf("\nError al crear el archivo de destino %s\n",outpath);
+	  exit(-1);
+	}
 
-	     /*
-        *  Validando la escritura de bytes sobre el archivo destino
-        */
+        /*
+         *  Validando la escritura de bytes sobre el archivo destino
+         */
         writer = write(outcriptor,bufferout,numbytes);
         if(writer < 0){
       	  printf("\nError al escribir en el archivo %s\n",outpath);
-  	      exit(-1);
+  	  exit(-1);
         }else{
       	  //printf("\n[OK]Todo se escribió genial en el archivo %s\n",outpath);
         }
 
-       /*
-        *  Liberando memoria, cerrando descriptores y finalizando el hijo.
-        */
+        /*
+         *  Liberando memoria, cerrando descriptores y finalizando el hijo.
+         */
         free(bufferout);
         close(outcriptor);
         exit(0);
         break;
 
-     /*
-	    *  Proceso Padre
-	    */
+      /*
+       *  Proceso Padre
+       */
       default:
         close(fd[0]);
 
-     /*
-	    *  Validando la apertura del archivo pasado por argumentos
-	    */
+            /*
+	     *  Validando la apertura del archivo pasado por argumentos
+	     */
 	    descriptor = open(path, O_RDONLY);
 	    if(descriptor < 0){
 	      printf("\nError al abrir el archivo %s\n",path);
 	      exit(-1);
 	    }
 
-	   /*
-	    *  Validando la lectura de bytes del archivo origen
-	    */
+	    /*
+	     *  Validando la lectura de bytes del archivo origen
+	     */
 	    reader = read(descriptor,buffer,numbytes);
 	    if(reader < 0){
-	  	  printf("\nError al leer el archivo %s\n",path);
-	  	  exit(-1);
+	      printf("\nError al leer el archivo %s\n",path);
+	      exit(-1);
 	    }else{
 	      //printf("\n[*]Numero de bytes leidos: %ld\n",numbytes);
 	    }
         
-      /*
-	     *  Escribiendo los bytes del archivo a la tuberia y esperando a que
-	     *  el hijo acabe con una salida satisfactoria
-	     */        
+        /*
+	 *  Escribiendo los bytes del archivo a la tuberia y esperando a que
+	 *  el hijo acabe con una salida satisfactoria
+	 */        
         write(fd[1], buffer, numbytes);
         //printf("\nEscritos %ld en la tuberia por el padre\n",numbytes);
         wait(&estado);
         //printf("\nMurio el hijo con un exit %d\n", ((estado>>8) & 0xFF));
 
-       /*
-        *  Liberando memoria y cerrando descriptores
-        */
+        /*
+         *  Liberando memoria y cerrando descriptores
+         */
         close(descriptor);
-  	    free(buffer);
-
+  	free(buffer);
+		    
     }
 
   }else{
