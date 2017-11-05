@@ -16,6 +16,8 @@
  *  A espera de revisiones y mejoras.
  *
  *  Secu, de StationX11
+ *
+ *  Agradecimientos a Dxr (de CrackSLatinoS) y KiloKang (de Fwhibbit) por su ayuda y consejo!
  */
 
 
