@@ -1,11 +1,11 @@
 /*
- *  Copiar.c Version 1.1
+ *  Copiar.c Version 1.2
  *
- *  Este programa te permite hacer un duplicado de un archivo pasado por argumentos a otro destino, 
+ *  Este programa te permite hacer UN duplicado de un archivo pasado por argumentos a otro destino, 
  *  también pasado por argumento. 
  *  El programa determina los bytes del archivo a copiar, hace una lectura continua en bloques de 1024 bytes,
  *  y los va copiando en la tuberia, de igual forma el padre va leyendo en bloques de 1024 bytes
- *  y escribiendo dicho bloque de bytes en el archivo final.
+ *  y escribiendo dicho bloque de bytes en el archivo final sin previa espera a que finalice el hijo la escritura.
  *
  *  El procedimiento es: El padre crea un hijo que lee el archivo bytes a bytes (en bloques de 'LENBLOCK'),
  *  los pasa a la tuberia con la que se comunica con el padre, y este finalmente escribe dichos bloques en
@@ -17,7 +17,7 @@
  *
  *  Secu, de StationX11
  *
- *  Agradecimientos a Dxr (de CrackSLatinoS) y KiloKang (de Fwhibbit) por su ayuda y consejo!
+ *  Agradecimientos a Dxr (de CrackSLatinoS), KiloKang (de Fwhibbit) y Mester (de SUA) por su ayuda y consejo!
  */
 
 
@@ -62,8 +62,11 @@ int main(int argc, char **argv){
 
   /*
    *  Validando argumentos introducidos en el inicio.
-   */	
-  if(argc == 3){
+   */
+  if(argc == 1){
+    printf("\n[*] Uso: ej2_so archivoacopiar nuevoarchivo\n\n");
+    exit(-1);
+  }else if(argc == 3){
     path = argv[1];
     outpath = argv[2];
 
@@ -125,9 +128,9 @@ int main(int argc, char **argv){
        */
       default:
 
-      close(fd[1]);                                        // Cerrando el modo escritura en la tuberia.
-      wait(NULL);                                          // Esperando a que el hijo finalice su escritura en la tuberia.
-      bufferout = (char*)malloc(LENBLOCK/sizeof(char));    // Reservando un bloque de 1024 bytes como antes para el buffer.
+      close(fd[1]);                                          // Cerrando el modo escritura en la tuberia.
+      //wait(NULL);                                          // No hace falta esperar a que acabe el hijo, puede ir leyendo.
+      bufferout = (char*)malloc(LENBLOCK/sizeof(char));      // Reservando un bloque de 1024 bytes como antes para el buffer.
 
       // Lectura por bloques hasta el último.
       while((readpipe = read(fd[0],bufferout,LENBLOCK)) != 0){
