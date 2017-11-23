@@ -69,10 +69,10 @@ int main(int argc, char *argv[]){
 
 
   // Rellenando datos del Servidor.
-  servidor.sin_family = AF_INET;							            //Socket no interno, sino a internet
-  servidor.sin_port = htons(PUERTO);						          //pasar el puerto a el formato de Bytes de Red
-  servidor.sin_addr = *((struct in_addr *)rec->h_addr);		//coloca la ip indicada
-  memset(servidor.sin_zero,0,8);							            //Todo a ceros
+  servidor.sin_family = AF_INET;                          //Socket no interno, sino a internet
+  servidor.sin_port = htons(PUERTO);                      //pasar el puerto a el formato de Bytes de Red
+  servidor.sin_addr = *((struct in_addr *)rec->h_addr);   //coloca la ip indicada
+  memset(servidor.sin_zero,0,8);                          //Todo a ceros
 
 
   // Conectandose al servidor.
